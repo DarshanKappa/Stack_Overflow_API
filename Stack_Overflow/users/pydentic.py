@@ -23,3 +23,10 @@ class RegistrationValidation(BaseModel):
     
     class Config:
         extra = 'forbid'
+
+class CredentialValidation(BaseModel):
+    username: str
+    password: str
+    
+    class Config:
+        extra = 'forbid'
