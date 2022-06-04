@@ -1,7 +1,7 @@
-from Q_and_A.pydantic import QuestionValidation
+from Q_and_A.pydantic import AnswerValidation, QuestionValidation
 from rest_framework import serializers
 from users.utils import pydantic_validation
-from .models import Questions
+from .models import Answers, Questions
 
 class QuestionSerializer(serializers.ModelSerializer):
 
@@ -13,6 +13,7 @@ class QuestionSerializer(serializers.ModelSerializer):
             'body',
             'tag',
         ]
+
     def to_internal_value(self, data):
         return data
     
@@ -33,3 +34,32 @@ class QuestionSerializer(serializers.ModelSerializer):
         question.tag = validate_data.get('tag')
         question.save()
         return question
+    
+    
+class AnswerSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = Answers
+        fields = [
+            'id',
+            'question',
+            'body',
+        ]
+        
+    def to_internal_value(self, data):
+        data.update({'question': data.pop('question_id')})
+        return data
+    
+    def validate(self, data):
+        is_valid, msg = pydantic_validation(AnswerValidation, data)
+        if not is_valid:
+            raise serializers.ValidationError(msg)
+        return data
+    
+    def create(self, validate_data):
+        question = Questions.objects.get(pk=int(validate_data.get('question')))
+        validate_data.update({'question':question})
+        answer = Answers(**validate_data)
+        answer.save()
+        return answer
+    

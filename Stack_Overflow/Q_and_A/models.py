@@ -32,4 +32,4 @@ class Answers(models.Model):
         verbose_name_plural = 'Answers'
         
     def __str__(self):
-        return self.question
+        return self.question.title
