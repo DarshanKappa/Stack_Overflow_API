@@ -11,6 +11,8 @@ class RegistrationValidation(BaseModel):
     
     @validator("username", pre=False)
     def is_user_exists(cls, v):
+        if len(v) < 4:
+            raise ValueError("minimum 4 characters are required")
         if User.objects.filter(username=v).exists():
             raise ValueError("username already exists")
         return v
