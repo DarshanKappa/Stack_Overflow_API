@@ -1,21 +1,31 @@
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.generics import ListAPIView
-from Q_and_A.apis import BaseLimitOffsetPagination
+from rest_framework.response import Response
 from .models import Notify
 from .serializers import QuestionersAnswersNotificationSerilizer
-from django.contrib.auth.models import User
 
-class ListNotification(ListAPIView):
+
+class AnswerNotification(ListAPIView):
     authentication_classes = [JWTAuthentication,]
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
     
     serializer_class = QuestionersAnswersNotificationSerilizer
-    pagination_class = BaseLimitOffsetPagination
     
     def get_queryset(self):
         user = self.request.user
-        queryset = Notify.objects.filter(user=User.objects.get(pk=1), user_type='Q')
+        queryset = Notify.objects.filter(user=user, user_type='Q')
         return queryset
     
+    def get(self, request, *args, **kwargs):
+        resp = self.list(request, *args, **kwargs)
+        queryset = self.get_queryset()
+        queryset.delete()
+        return Response(resp.data)
     
+class ApprovedNotification(AnswerNotification):
+    
+    def get_queryset(self):
+        user = self.request.user
+        queryset = Notify.objects.filter(user=user, user_type='A')
+        return queryset

@@ -1,5 +1,5 @@
 import re
-from Q_and_A.models import Questions
+from Q_and_A.models import Answers, Questions
 from pydantic import BaseModel, validator, ValidationError
 from django.contrib.auth.models import User
 
@@ -44,6 +44,19 @@ class AnswerValidation(BaseModel):
     def check_question(cls, v):
         if not Questions.objects.filter(pk=int(v)).first():
             raise ValueError("Invalid question id")
+        return v
+    
+    class Config:
+        extra = 'forbid'
+
+
+class AnswerApprovalVlaidation(BaseModel):
+    answer_id: int
+    
+    @validator('answer_id')
+    def check_answer_id(cls, v):
+        if not Answers.objects.filter(pk=int(v)).first():
+            raise ValueError("Invalid answer id")
         return v
     
     class Config:

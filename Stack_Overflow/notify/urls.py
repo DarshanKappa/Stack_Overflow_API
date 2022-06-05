@@ -1,6 +1,7 @@
 from django.urls import path
-from .apis import ListNotification
+from .apis import AnswerNotification, ApprovedNotification
 
 urlpatterns = [
-    path('answer', ListNotification.as_view())
+    path('answer', AnswerNotification.as_view()),
+    path('approved', ApprovedNotification.as_view())
 ]

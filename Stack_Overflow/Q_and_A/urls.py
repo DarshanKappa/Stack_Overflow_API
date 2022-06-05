@@ -1,5 +1,5 @@
 from django.urls import path
-from .apis import QuestionAPIView, AnswerAPIView, QuestionAnswerList, QuestionsOfUser
+from .apis import AnswerApproval, QuestionAPIView, AnswerAPIView, QuestionAnswerList, QuestionsOfUser
 
 
 urlpatterns = [
@@ -7,5 +7,6 @@ urlpatterns = [
     path('question/<int:id>', QuestionAPIView.as_view()),
     path('questions/', QuestionsOfUser.as_view()),
     path('answer', AnswerAPIView.as_view()),
-    path('question-answer-list', QuestionAnswerList.as_view())
+    path('question-answer-list', QuestionAnswerList.as_view()),
+    path('answer-approval', AnswerApproval.as_view()),
 ]
