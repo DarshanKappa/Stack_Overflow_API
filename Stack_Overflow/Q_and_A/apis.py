@@ -82,7 +82,7 @@ class QuestionsOfUser(ListAPIView):
     serializer_class = QuestionListSerializer
     pagination_class = BaseLimitOffsetPagination
 
-    def get(self, request, user_id, *args, **kwargs):
-        self.queryset = Questions.objects.filter(user=user_id).order_by('-vote')
-        resp = self.list(request, user_id, *args, **kwargs)
-        return Response(data=resp.data)
+    def get_queryset(self):
+        user = self.request.user
+        queryset = Questions.objects.filter(user=user)
+        return queryset
