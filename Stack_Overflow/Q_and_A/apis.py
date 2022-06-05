@@ -13,6 +13,9 @@ from django.contrib.auth.models import User
 
 
 class QuestionAPIView(APIView):
+    '''
+    API to Crate, Update and Retrive the Question
+    '''
     authentication_classes = [JWTAuthentication,]
     permission_classes = [IsAuthenticated]
     
@@ -33,7 +36,7 @@ class QuestionAPIView(APIView):
             return Response(data=serializer.errors.get('non_field_errors'), status=400)
         serializer.save()
         
-        return Response(data={'question': serializer.data})
+        return Response(data={'question': serializer.data}, status=201)
 
     def put(self, request, id, *args, **kwargs):
         data = request.data
@@ -51,6 +54,9 @@ class QuestionAPIView(APIView):
     
     
 class AnswerAPIView(APIView):
+    '''
+    API to Create Answer on any Question
+    '''
     authentication_classes = [JWTAuthentication,]
     permission_classes = [IsAuthenticated]
     
@@ -74,6 +80,9 @@ class BaseLimitOffsetPagination(LimitOffsetPagination):
     max_limit = 100
 
 class QuestionAnswerList(ListAPIView):
+    '''
+    Return List of All Questions with those Answers
+    '''
     authentication_classes = [JWTAuthentication,]
     permission_classes = [IsAuthenticated]
     
@@ -83,6 +92,9 @@ class QuestionAnswerList(ListAPIView):
     
     
 class QuestionsOfUser(ListAPIView):
+    '''
+    Return List of Questions with those Answers which create by authanticated user
+    '''
     authentication_classes = [JWTAuthentication,]
     permission_classes = [IsAuthenticated]
     
@@ -96,6 +108,9 @@ class QuestionsOfUser(ListAPIView):
 
 
 class AnswerApproval(APIView):
+    '''
+    API to approve answer by questioner
+    '''
     authentication_classes = [JWTAuthentication,]
     permission_classes = [IsAuthenticated]
     
@@ -125,6 +140,9 @@ class AnswerApproval(APIView):
         
 
 class SearchQuestions(ListAPIView):
+    '''
+    Enter tag and return question accordign tag
+    '''
     authentication_classes = [JWTAuthentication,]
     permission_classes = [IsAuthenticated]
     
@@ -138,6 +156,9 @@ class SearchQuestions(ListAPIView):
     
     
 class VoteToQuestion(APIView):
+    '''
+    API to give Vote to questions
+    '''
     
     def post(self, request, *args, **kwargs):
         data = request.data
@@ -150,6 +171,9 @@ class VoteToQuestion(APIView):
         return Response(data={})
     
 class VoteToAnswer(APIView):
+    '''
+    API to give Vote to Answer
+    '''
     
     def post(self, request, *args, **kwargs):
         data = request.data

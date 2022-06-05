@@ -7,6 +7,10 @@ from .serializers import QuestionersAnswersNotificationSerilizer
 
 
 class AnswerNotification(ListAPIView):
+    '''
+    Notify when reply on the question. This API Return instance only one time
+    Like notification
+    '''
     authentication_classes = [JWTAuthentication,]
     permission_classes = [IsAuthenticated]
     
@@ -24,6 +28,10 @@ class AnswerNotification(ListAPIView):
         return Response(resp.data)
     
 class ApprovedNotification(AnswerNotification):
+    '''
+    Notify when approve the answer by questioner. This API Return instance only one time
+    Like notification
+    '''
     
     def get_queryset(self):
         user = self.request.user
