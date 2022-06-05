@@ -10,9 +10,11 @@ class QuestionSerializer(serializers.ModelSerializer):
         model = Questions
         fields = [
             'id',
+            'user',
             'title',
             'body',
             'tag',
+            'vote',
         ]
 
     def to_internal_value(self, data):
@@ -25,6 +27,8 @@ class QuestionSerializer(serializers.ModelSerializer):
         return data
     
     def create(self, validate_data):
+        request = self.context.get('request')
+        validate_data.update({'user':request.user})
         question = Questions(**validate_data)
         question.save()
         return question

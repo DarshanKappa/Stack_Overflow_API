@@ -1,11 +1,12 @@
 from Q_and_A.models import Questions
-from Q_and_A.serializers import AnswerSerializer, QuestionSerializer, QuestionsAnswerSerializer
+from Q_and_A.serializers import AnswerSerializer, QuestionListSerializer, QuestionSerializer, QuestionsAnswerSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.generics import ListAPIView
 from rest_framework.pagination import LimitOffsetPagination
+from users.utils import pydantic_validation
 
 
 class QuestionAPIView(APIView):
@@ -24,7 +25,7 @@ class QuestionAPIView(APIView):
     def post(self, request, *args, **kwargs):
         data = request.data
         
-        serializer = QuestionSerializer(data=data)
+        serializer = QuestionSerializer(data=data, context={'request':request})
         if not serializer.is_valid():
             return Response(data=serializer.errors.get('non_field_errors'), status=400)
         serializer.save()
@@ -72,3 +73,16 @@ class QuestionAnswerList(ListAPIView):
     queryset = Questions.objects.all()
     serializer_class = QuestionsAnswerSerializer
     pagination_class = BaseLimitOffsetPagination
+    
+    
+class QuestionsOfUser(ListAPIView):
+    authentication_classes = [JWTAuthentication,]
+    permission_classes = [IsAuthenticated]
+    
+    serializer_class = QuestionListSerializer
+    pagination_class = BaseLimitOffsetPagination
+
+    def get(self, request, user_id, *args, **kwargs):
+        self.queryset = Questions.objects.filter(user=user_id).order_by('-vote')
+        resp = self.list(request, user_id, *args, **kwargs)
+        return Response(data=resp.data)
