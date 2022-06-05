@@ -1,12 +1,12 @@
 from Q_and_A.models import Questions
 from Q_and_A.serializers import AnswerSerializer, QuestionListSerializer, QuestionSerializer, QuestionsAnswerSerializer
+from notify.models import Notify
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.generics import ListAPIView
 from rest_framework.pagination import LimitOffsetPagination
-from users.utils import pydantic_validation
 
 
 class QuestionAPIView(APIView):
@@ -54,10 +54,14 @@ class AnswerAPIView(APIView):
     def post(self, request, *args, **kwargs):
         data = request.data
         
-        serializer = AnswerSerializer(data=data)
+        serializer = AnswerSerializer(data=data, context={'request':request})
         if not serializer.is_valid():
             return Response(data=serializer.errors.get('non_field_errors'), status=400)
-        serializer.save()
+        answer = serializer.save()
+
+        # add notification to notify to questioner
+        notification = Notify(user=answer.question.user, user_type='Q', question=answer.question, answer=answer)
+        notification.save()
 
         return Response(data={'answer': serializer.data}, status=201)
     

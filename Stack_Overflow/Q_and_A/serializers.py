@@ -1,4 +1,3 @@
-from re import A
 from Q_and_A.pydantic import AnswerValidation, QuestionValidation
 from rest_framework import serializers
 from users.utils import pydantic_validation
@@ -62,6 +61,8 @@ class AnswerSerializer(serializers.ModelSerializer):
         return data
     
     def create(self, validate_data):
+        request = self.context.get('request')
+        validate_data.update({'user':request.user})
         question = Questions.objects.get(pk=int(validate_data.get('question')))
         validate_data.update({'question':question})
         answer = Answers(**validate_data)
