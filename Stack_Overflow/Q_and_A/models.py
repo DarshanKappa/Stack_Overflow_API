@@ -36,3 +36,33 @@ class Answers(models.Model):
         
     def __str__(self):
         return self.question.title
+    
+
+VOTE_CHOICES = (
+        ('UP', 'UP'),
+        ('', '-----'),
+        ('DOWN', 'DOWN')
+    )
+class QuestionUserVotes(models.Model):
+    
+    user = models.ForeignKey(User, on_delete=models.PROTECT)
+    question = models.ForeignKey(Questions, related_name="question_votes", on_delete=models.PROTECT)
+    up_down_vote = models.CharField(max_length=50, choices=VOTE_CHOICES)
+    
+    class Meta:
+        app_label = 'Q_and_A'
+        verbose_name = 'Question and User'
+        verbose_name_plural = 'Question and User'
+
+
+class AnswerUserVotes(models.Model):
+    
+    user = models.ForeignKey(User, on_delete=models.PROTECT)
+    answer = models.ForeignKey(Answers, related_name="answer_votes", on_delete=models.PROTECT)
+    up_down_vote = models.CharField(max_length=50, choices=VOTE_CHOICES)
+    
+    class Meta:
+        app_label = 'Q_and_A'
+        verbose_name = 'Answer and User'
+        verbose_name_plural = 'Answer and User'
+        

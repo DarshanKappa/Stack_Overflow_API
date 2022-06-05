@@ -1,6 +1,6 @@
 from Q_and_A.models import Answers, Questions
 from Q_and_A.pydantic import AnswerApprovalVlaidation
-from Q_and_A.serializers import AnswerSerializer, QuestionSerializer, QuestionsAnswerSerializer
+from Q_and_A.serializers import VoteToAnswerSerializer, AnswerSerializer, QuestionSerializer, QuestionsAnswerSerializer, VoteToQuestionSerializer
 from notify.models import Notify
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -135,3 +135,29 @@ class SearchQuestions(ListAPIView):
         tag = self.request.query_params.get('tag')
         queryset = Questions.objects.filter(tag=tag)
         return queryset
+    
+    
+class VoteToQuestion(APIView):
+    
+    def post(self, request, *args, **kwargs):
+        data = request.data
+
+        serializer = VoteToQuestionSerializer(data=data, context={'request':request})
+        if not serializer.is_valid():
+            return Response(data=serializer.errors.get('non_field_errors'), status=400)
+        serializer.save()
+
+        return Response(data={})
+    
+class VoteToAnswer(APIView):
+    
+    def post(self, request, *args, **kwargs):
+        data = request.data
+
+        serializer = VoteToAnswerSerializer(data=data, context={'request':request})
+        if not serializer.is_valid():
+            return Response(data=serializer.errors.get('non_field_errors'), status=400)
+        serializer.save()
+
+        return Response(data={})
+
