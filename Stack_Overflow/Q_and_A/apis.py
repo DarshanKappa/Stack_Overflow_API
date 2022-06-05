@@ -110,8 +110,10 @@ class AnswerApproval(APIView):
         answer = Answers.objects.get(pk=data.get('answer_id'))
         if user != answer.question.user:
             return Response("Invalid answer id", status=400)
+
         if answer.is_approved == True:
             return Response({})
+
         answer.is_approved = True
         answer.save()
         
@@ -121,4 +123,15 @@ class AnswerApproval(APIView):
         
         return Response({})
         
-        
+
+class SearchQuestions(ListAPIView):
+    authentication_classes = [JWTAuthentication,]
+    permission_classes = [IsAuthenticated]
+    
+    serializer_class = QuestionsAnswerSerializer
+    pagination_class = BaseLimitOffsetPagination
+    
+    def get_queryset(self):
+        tag = self.request.query_params.get('tag')
+        queryset = Questions.objects.filter(tag=tag)
+        return queryset
