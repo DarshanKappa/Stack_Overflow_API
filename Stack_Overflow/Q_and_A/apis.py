@@ -1,9 +1,11 @@
 from Q_and_A.models import Questions
-from Q_and_A.serializers import AnswerSerializer, QuestionSerializer
+from Q_and_A.serializers import AnswerSerializer, QuestionSerializer, QuestionsAnswerSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.generics import ListAPIView
+from rest_framework.pagination import LimitOffsetPagination
 
 
 class QuestionAPIView(APIView):
@@ -57,3 +59,16 @@ class AnswerAPIView(APIView):
         serializer.save()
 
         return Response(data={'answer': serializer.data}, status=201)
+    
+
+class BaseLimitOffsetPagination(LimitOffsetPagination):
+    default_limit = 20
+    max_limit = 100
+
+class QuestionAnswerList(ListAPIView):
+    authentication_classes = [JWTAuthentication,]
+    permission_classes = [IsAuthenticated]
+    
+    queryset = Questions.objects.all()
+    serializer_class = QuestionsAnswerSerializer
+    pagination_class = BaseLimitOffsetPagination

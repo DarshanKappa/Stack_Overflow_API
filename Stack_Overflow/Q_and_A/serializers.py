@@ -1,3 +1,4 @@
+from re import A
 from Q_and_A.pydantic import AnswerValidation, QuestionValidation
 from rest_framework import serializers
 from users.utils import pydantic_validation
@@ -62,4 +63,34 @@ class AnswerSerializer(serializers.ModelSerializer):
         answer = Answers(**validate_data)
         answer.save()
         return answer
+
+
+class QuestionListSerializer(serializers.ModelSerializer):
     
+    class Meta:
+        model = Questions
+        fields = "__all__"
+
+class AnswerListSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = Answers
+        fields = "__all__"
+
+class QuestionsAnswerSerializer(serializers.Serializer):
+    
+    question = serializers.SerializerMethodField()
+    answers = serializers.SerializerMethodField()
+    
+    class Meta:
+        fields = [
+            'question',
+            'answers',
+        ]
+        
+    def get_question(self, obj):
+        return QuestionListSerializer(obj).data
+    
+    def get_answers(self, obj):
+        queryset = Answers.objects.filter(question=obj).order_by('-vote')
+        return AnswerListSerializer(queryset, many=True).data
